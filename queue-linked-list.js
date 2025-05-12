@@ -1,46 +1,51 @@
 "use strict";
 function linkedListQueue() {
-    function Node(value = 0, nextRef = null) {
+    function Node(value = null, nextRef = null) {
         this.value = value;
         this.next = nextRef;
     }
-    let head = new Node(Infinity), tail = new Node(-Infinity);
-    [head.next, tail.next] = [tail, head];
+    let head = new Node(), tail = head;
     let size = 0;
 
-    function checkSize() {
+    function checkEmpty() {
         if (size === 0) {
             throw new RangeError("Queue is empty!");
         }
     }
 
     function push(value) {
-        const node = new Node(value);
-        tail.next.next = node;
-        tail.next = node;
+        tail.next = new Node(value);
+        tail = tail.next;
         size++;
     }
 
     function pop() {
-        checkSize();
-
-        let out = head.next.value;
-        head.next = head.next.next
+        checkEmpty();
+        const node = head.next;
+        head.next = node.next;
+        tail = (node === tail)? head: tail;
         --size;
-        return out;
+        node.next = null; // Break the reference
+        return node.value;
     }
 
     function peek() {
-        checkSize();
+        checkEmpty();
         return head.next.value;
     }
 
     function getSize(){
         return size;
     }
+
     function log() {
-        console.log(head);
-        console.log(tail);
+        let current = head.next;
+        const values = [];
+        while (current) {
+            values.push(current.value);
+            current = current.next;
+        }
+        console.log(`Queue[${size}]: ${values.join(' → ')}`);
     }
 
     return {pop, getSize, peek, push, log}
@@ -51,6 +56,7 @@ const myQueue = linkedListQueue();
 myQueue.push(1);
 myQueue.push(2);
 myQueue.push(3);
+myQueue.log();
 console.log(myQueue.peek()); // 1
 console.log(myQueue.pop());  // 1
 console.log(myQueue.peek()); // 2
